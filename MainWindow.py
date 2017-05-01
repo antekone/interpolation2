@@ -136,7 +136,7 @@ class MainWindow(Gtk.Window):
 
 
 def main():
-    inter = Interpolation("/home/antek/.local/share/Steam/steamapps/common/Rust/Bundles/shared/content.bundle")
+    inter = Interpolation("data.bin")
     win = MainWindow(inter)
     win.connect("delete-event", Gtk.main_quit)
     win.show_all()
