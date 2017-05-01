@@ -18,6 +18,7 @@ class Graph(Gtk.DrawingArea):
         self.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
                         Gdk.EventMask.BUTTON_PRESS_MASK |
                         Gdk.EventMask.BUTTON_RELEASE_MASK)
+
         self.file_loaded = self.inter.size() > 0
         self.selected_x = None
 
