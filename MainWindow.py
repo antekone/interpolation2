@@ -57,6 +57,9 @@ class Graph(Gtk.DrawingArea):
         range_start = int(max_size * x / self.width)
         range_end = int(max_size * (x + 1) / self.width) - 1
 
+        if range_end <= range_start:
+            range_end = range_start + 1
+
         return (range_start, range_end)
 
     def on_motion_notify(self, widget, event):
@@ -99,7 +102,7 @@ class Graph(Gtk.DrawingArea):
     def on_draw_loaded(self, widget, c):
         self.draw_graph(c)
         if self.selected_x is not None:
-            c.set_source_rgb(70, 70, 70)
+            c.set_source_rgb(2.0, 0.21, 0.21)
             c.set_line_width(1.0)
             c.move_to(self.selected_x, 0)
             c.line_to(self.selected_x, self.height)
