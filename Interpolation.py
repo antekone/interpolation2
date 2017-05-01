@@ -23,7 +23,6 @@ class Interpolation:
     def __init__(self, path):
         self.fd = open(path, 'rb')
         self.stat = os.stat(path)
-        print("opened: {}".format(self.fd))
 
     def size(self):
         return self.stat.st_size
@@ -31,6 +30,8 @@ class Interpolation:
     def value_for_range(self, range_start, range_size):
         if self.fd.tell() != range_start:
             self.fd.seek(range_start)
+
+        Log.put("reading offset %08x / %08x" % (range_start, range_size))
 
         data = self.fd.read(range_size)
         return get_entropy(data)

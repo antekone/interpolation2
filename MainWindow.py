@@ -1,8 +1,11 @@
 import gi
 import cairo
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from Interpolation import Interpolation
+from Utils import adjust
+from Log import Log
 
 class Graph(Gtk.DrawingArea):
     def __init__(self, inter):
@@ -21,16 +24,18 @@ class Graph(Gtk.DrawingArea):
 
         self.file_loaded = self.inter.size() > 0
         self.selected_x = None
+        self.graph = [0] * 550
 
         print("inter size: {}".format(self.inter.size()))
 
     def on_configure(self, widget, data):
         self.width = self.get_allocated_width()
-        self.graph = self.width * [0]
         widget.queue_draw()
 
     def draw_all(self):
-        for x in range(0, self.get_allocated_width()):
+        self.width = self.get_allocated_width()
+
+        for x in range(0, len(self.graph)):
             range_start, range_end = self.get_file_range_based_on_x(x)
 
             range_size = range_end - range_start
@@ -40,22 +45,24 @@ class Graph(Gtk.DrawingArea):
         self.queue_draw()
 
     def on_button_press(self, widget, event):
-        range_start, range_end = self.get_file_range_based_on_x(int(event.x))
+        graph_idx = adjust(int(event.x), self.get_allocated_width(), len(self.graph))
+        range_start, range_end = self.get_file_range_based_on_x(graph_idx)
         range_size = range_end - range_start
 
         v = self.inter.value_for_range(range_start, range_size)
-        self.graph[int(event.x)] = v
+
+        x = int(event.x)
+        dx = adjust(x, self.get_allocated_width(), len(self.graph))
+        Log.put("x=%d, dx=%d" % (x, dx))
+        self.graph[dx] = v
 
         widget.queue_draw()
 
     def get_file_range_based_on_x(self, x):
-        self.width = self.get_allocated_width()
-        self.height = self.get_allocated_height()
-
         max_size = self.inter.size()
 
-        range_start = int(max_size * x / self.width)
-        range_end = int(max_size * (x + 1) / self.width) - 1
+        range_start = adjust(x, len(self.graph), max_size)
+        range_end = adjust(x + 1, len(self.graph), max_size) - 1
 
         if range_end <= range_start:
             range_end = range_start + 1
@@ -90,8 +97,9 @@ class Graph(Gtk.DrawingArea):
         c.set_source_rgb(140, 140, 140)
         c.set_line_width(1.0)
 
-        for x in range(0, len(self.graph)):
-            value = self.graph[x]
+        for x in range(0, self.width):
+            dx = adjust(x, self.width, len(self.graph))
+            value = self.graph[dx]
             pixel_width = int(self.height * value / max_value)
 
             c.move_to(x, self.height)
