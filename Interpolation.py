@@ -19,6 +19,16 @@ def get_entropy(data):
     e *= 10000
     return e
 
+def linear_interpolation(offset, left, right):
+    offset_left, entropy_left = left
+    offset_right, entropy_right = right
+
+    e_left = (offset_right - offset) * entropy_left
+    e_right = (offset - offset_left) * entropy_right
+    entropy = (e_left + e_right) / (offset_right - offset_left)
+
+    return entropy
+
 class Interpolation:
     def __init__(self, path):
         self.fd = open(path, 'rb')
